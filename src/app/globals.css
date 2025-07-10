@@ -1,0 +1,230 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 96%; /* #F5F5F5 */
+    --foreground: 222 84% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 84% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 5%;
+    --primary: 231 29% 63%; /* #A88C5C */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 222 84% 5%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 222 84% 25%;
+    --accent: 16 81% 50%; /* #E64A19 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 231 29% 63%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 84% 5%;
+    --foreground: 0 0% 98%;
+    --card: 222 84% 5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 84% 5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 231 29% 63%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 84% 10%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 222 84% 10%;
+    --muted-foreground: 0 0% 63%;
+    --accent: 16 81% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 84% 15%;
+    --input: 222 84% 15%;
+    --ring: 231 29% 63%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    direction: rtl;
+  }
+}
+
+.status-icon {
+    @apply font-bold py-1 px-2 rounded-md text-xs;
+}
+
+.status-icon.open {
+    @apply text-green-700 bg-green-100;
+}
+
+.status-icon.closed {
+    @apply text-red-700 bg-red-100;
+}
+
+.status-icon.transferred {
+    @apply text-blue-700 bg-blue-100;
+}
+.status-icon.not-transferred {
+    @apply text-yellow-700 bg-yellow-100;
+}
+
+/* Styles for printable invoice paper */
+#paper {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: #fff;
+  color: #000;
+  padding: 3mm;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  direction: rtl;
+}
+
+#paper .header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0mm;
+  margin-bottom: 0mm;
+}
+
+#paper #storeName {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #343a40;
+  text-align: right;
+  flex: 1;
+}
+
+#paper .header div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#paper .logo {
+  width: 130px;
+}
+
+#paper .info {
+  width: 100%;
+  font-size: 1.2rem;
+  margin: 3mm 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  padding: 0 10mm;
+}
+
+#paper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 3mm 0;
+}
+
+#paper thead {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+#paper th {
+  padding: 3px;
+  border: 2px solid #ccc;
+}
+
+#paper tr {
+  text-align: center;
+}
+
+#paper .tr {
+    border: 1px solid #ccc;
+    padding: 3px;
+}
+
+#paper tfoot {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+#paper tfoot td {
+  padding: 3px;
+  border-top: 2px solid #ccc;
+  text-align: center;
+}
+
+#paper .footer {
+  width: 100%;
+  margin-top: 0mm;
+  padding-right: 5mm;
+  font-size: 1rem;
+}
+
+#paper .note-r, #paper #notesContainer {
+  text-align: right;
+  width: 100%;
+  margin: 10px 0;
+  font-weight: bolder;
+}
+
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide everything on the page */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Make the paper and its contents visible */
+  #paper, #paper * {
+    visibility: visible;
+  }
+
+  /*
+   * Move the paper to the top-left of the page,
+   * taking it out of the normal flow of the hidden elements.
+   * This is the key to preventing the hidden elements'
+   * layout from affecting the print output.
+   */
+  #paper {
+    position: fixed; /* 'fixed' is often more robust for print than 'absolute' */
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 10mm; /* Adjust padding for print margins */
+    width: 100%;
+    height: 100%;
+    min-height: 0; /* Override screen styles */
+    box-shadow: none; /* Remove screen shadow */
+    border: none;
+    box-sizing: border-box; /* Ensure padding is included in width/height */
+  }
+
+  #paper #state-invoice {
+    color: #fff !important;
+  }
+}
