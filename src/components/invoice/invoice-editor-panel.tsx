@@ -33,17 +33,19 @@ interface InvoiceEditorPanelProps {
   onSelectInvoice: (invoice: Invoice | null) => void;
   getProductSuggestions: (query: string) => Promise<string[]>;
   getColorSuggestions: (query: string) => Promise<string[]>;
+  getCustomerSuggestions: (query: string) => Promise<string[]>;
   userId: string;
 }
 
 const emptyProduct: Omit<Product, 'id' | 'total'> = { name: '', color: '', price: 0, quantity: 1, meter: 0 };
 
-export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChange, onSelectInvoice, getProductSuggestions, getColorSuggestions, userId }: InvoiceEditorPanelProps) {
+export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChange, onSelectInvoice, getProductSuggestions, getColorSuggestions, getCustomerSuggestions, userId }: InvoiceEditorPanelProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [product, setProduct] = useState(emptyProduct);
   const [editingProductIndex, setEditingProductIndex] = useState<number | null>(null);
   const [productSuggestions, setProductSuggestions] = useState<string[]>([]);
   const [colorSuggestions, setColorSuggestions] = useState<string[]>([]);
+  const [customerSuggestions, setCustomerSuggestions] = useState<string[]>([]);
   const { toast } = useToast();
   
   const isNewInvoice = !invoice.id;
@@ -63,6 +65,17 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
 
   const handleFieldChange = (field: keyof Invoice, value: any) => {
     onInvoiceChange({ ...invoice, [field]: value });
+  };
+  
+  const handleCustomerNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    handleFieldChange('customerName', value);
+    if (value.length > 1) {
+      const result = await getCustomerSuggestions(value);
+      setCustomerSuggestions(result);
+    } else {
+      setCustomerSuggestions([]);
+    }
   };
 
   const handleSaveInvoice = async () => {
@@ -231,8 +244,19 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
         <CardContent className="flex-1 flex flex-col gap-4 p-4 overflow-y-auto">
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="customerName">اسم العميل</Label>
-                <Input id="customerName" value={invoice.customerName} onChange={e => handleFieldChange('customerName', e.target.value)} disabled={isLocked} />
+                 <Datalist
+                    label="اسم العميل"
+                    id="customerName"
+                    value={invoice.customerName}
+                    onInput={handleCustomerNameChange}
+                    onSelect={(value) => {
+                        handleFieldChange('customerName', value);
+                        setCustomerSuggestions([]);
+                    }}
+                    disabled={isLocked}
+                >
+                    {customerSuggestions.map((s,i) => <DatalistOption key={i} value={s} />)}
+                </Datalist>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="invoiceDate">تاريخ الفاتورة</Label>

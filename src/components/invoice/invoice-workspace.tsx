@@ -17,6 +17,7 @@ import InvoiceEditorPanel from './invoice-editor-panel';
 import InvoicePreviewPanel from './invoice-preview-panel';
 import { suggestProductName } from '@/ai/flows/smart-product-suggestions';
 import { suggestColorName } from '@/ai/flows/smart-color-suggestions';
+import { suggestCustomerName } from '@/ai/flows/smart-customer-suggestions';
 
 
 export default function InvoiceWorkspace() {
@@ -26,6 +27,7 @@ export default function InvoiceWorkspace() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [allProducts, setAllProducts] = useState<string[]>([]);
   const [allColors, setAllColors] = useState<string[]>([]);
+  const [allCustomers, setAllCustomers] = useState<string[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [liveInvoice, setLiveInvoice] = useState<Invoice | null>(null);
   const [isListVisible, setIsListVisible] = useState(false);
@@ -84,21 +86,29 @@ export default function InvoiceWorkspace() {
     });
     
     const fetchDropdownData = async (docId: string, setData: (data: string[]) => void) => {
-        try {
-            const docRef = doc(db, "dropdown", docId);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists() && Array.isArray(docSnap.data().fields)) {
-                setData(docSnap.data().fields);
+        const unsub = onSnapshot(doc(db, "dropdown", docId), (docSnap) => {
+            try {
+                if (docSnap.exists() && Array.isArray(docSnap.data().fields)) {
+                    setData(docSnap.data().fields);
+                }
+            } catch (error) {
+                console.error(`Error fetching ${docId}:`, error);
             }
-        } catch (error) {
-            console.error(`Error fetching ${docId}:`, error);
-        }
+        });
+        return unsub;
     };
     
-    fetchDropdownData('nametextile', setAllProducts);
-    fetchDropdownData('colors', setAllColors);
+    const unsubProducts = fetchDropdownData('nametextile', setAllProducts);
+    const unsubColors = fetchDropdownData('colors', setAllColors);
+    const unsubCustomers = fetchDropdownData('customers', setAllCustomers);
 
-    return () => unsubscribeInvoices();
+
+    return () => {
+        unsubscribeInvoices();
+        unsubProducts.then(unsub => unsub());
+        unsubColors.then(unsub => unsub());
+        unsubCustomers.then(unsub => unsub());
+    };
   }, [user, toast]);
 
   const handleSelectInvoice = (invoice: Invoice | null) => {
@@ -158,7 +168,22 @@ export default function InvoiceWorkspace() {
       });
       return result.suggestions;
     } catch (error) {
+      console.error("AI color suggestion error:", error);
       return allColors.filter(c => c.toLowerCase().includes(partialName.toLowerCase()));
+    }
+  };
+
+  const getCustomerSuggestions = async (partialName: string) => {
+    if (!partialName) return [];
+    try {
+      const result = await suggestCustomerName({
+        partialCustomerName: partialName,
+        availableCustomers: allCustomers,
+      });
+      return result.suggestions;
+    } catch (error) {
+      console.error("AI customer suggestion error:", error);
+      return allCustomers.filter(c => c.toLowerCase().includes(partialName.toLowerCase()));
     }
   };
 
@@ -173,8 +198,7 @@ export default function InvoiceWorkspace() {
       (window as any).html2canvas(paperElement, { 
         scale: 2,
         backgroundColor: '#ffffff',
-        useCORS: true,
-        scrollY: 0
+        useCORS: true
        }).then((canvas: HTMLCanvasElement) => {
         const link = document.createElement('a');
         link.download = `Invoice_${liveInvoiceRef.current?.invoiceNumber || 'preview'}.png`;
@@ -219,6 +243,7 @@ export default function InvoiceWorkspace() {
                 onSelectInvoice={handleSelectInvoice}
                 getProductSuggestions={getProductSuggestions}
                 getColorSuggestions={getColorSuggestions}
+                getCustomerSuggestions={getCustomerSuggestions}
                 userId={user.uid}
             />
         </main>

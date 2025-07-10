@@ -197,7 +197,7 @@ export async function updateUserRole(targetUserId: string, newRole: 'admin' | 'd
     revalidatePath('/admin/users');
 }
 
-export async function getSuggestions(collectionId: 'nametextile' | 'colors'): Promise<string[]> {
+export async function getSuggestions(collectionId: 'nametextile' | 'colors' | 'customers'): Promise<string[]> {
     const docRef = doc(db, "dropdown", collectionId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
@@ -208,7 +208,7 @@ export async function getSuggestions(collectionId: 'nametextile' | 'colors'): Pr
     return [];
 }
 
-export async function addSuggestion(collectionId: 'nametextile' | 'colors', newValue: string): Promise<void> {
+export async function addSuggestion(collectionId: 'nametextile' | 'colors' | 'customers', newValue: string): Promise<void> {
     if (!newValue.trim()) {
         throw new Error("Suggestion value cannot be empty.");
     }
@@ -225,7 +225,7 @@ export async function addSuggestion(collectionId: 'nametextile' | 'colors', newV
     revalidateSuggestions();
 }
 
-export async function deleteSuggestion(collectionId: 'nametextile' | 'colors', valueToDelete: string): Promise<void> {
+export async function deleteSuggestion(collectionId: 'nametextile' | 'colors' | 'customers', valueToDelete: string): Promise<void> {
     const docRef = doc(db, "dropdown", collectionId);
     await updateDoc(docRef, {
         fields: arrayRemove(valueToDelete)

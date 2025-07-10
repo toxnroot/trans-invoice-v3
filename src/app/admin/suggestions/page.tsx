@@ -29,7 +29,7 @@ import {
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
 
-type SuggestionType = 'nametextile' | 'colors';
+type SuggestionType = 'nametextile' | 'colors' | 'customers';
 
 const SuggestionManager = ({ type, title }: { type: SuggestionType, title: string }) => {
     const [items, setItems] = useState<string[]>([]);
@@ -196,9 +196,10 @@ export default function SuggestionsPage() {
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <SuggestionManager type="nametextile" title="الأصناف" />
             <SuggestionManager type="colors" title="الألوان" />
+            <SuggestionManager type="customers" title="أسماء العملاء" />
         </div>
       </main>
     </div>
