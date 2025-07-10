@@ -16,6 +16,7 @@ import InvoiceListPanel from './invoice-list-panel';
 import InvoiceEditorPanel from './invoice-editor-panel';
 import InvoicePreviewPanel from './invoice-preview-panel';
 import { suggestProductName } from '@/ai/flows/smart-product-suggestions';
+import { suggestColorName } from '@/ai/flows/smart-color-suggestions';
 
 
 export default function InvoiceWorkspace() {
@@ -24,6 +25,7 @@ export default function InvoiceWorkspace() {
   const [isLoading, setIsLoading] = useState(true);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [allProducts, setAllProducts] = useState<string[]>([]);
+  const [allColors, setAllColors] = useState<string[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [liveInvoice, setLiveInvoice] = useState<Invoice | null>(null);
   const [isListVisible, setIsListVisible] = useState(false);
@@ -67,16 +69,13 @@ export default function InvoiceWorkspace() {
                 setLiveInvoice(updatedLive);
                 setSelectedInvoice(updatedLive);
             } else {
-                // The invoice we were editing might have been deleted.
-                // Revert to the first invoice or a new one.
                 handleSelectInvoice(invoicesData.length > 0 ? invoicesData[0] : null);
             }
         } else if (!liveInvoiceRef.current) {
-            // This is the initial load or we were creating a new invoice
             if (invoicesData.length > 0) {
-                handleSelectInvoice(invoicesData[0]); // Default to first invoice
+                handleSelectInvoice(invoicesData[0]); 
             } else {
-                handleSelectInvoice(null); // No invoices, create a new one
+                handleSelectInvoice(null); 
             }
         }
     }, (error) => {
@@ -84,19 +83,20 @@ export default function InvoiceWorkspace() {
         toast({ variant: "destructive", title: "خطأ", description: "فشل تحميل الفواتير." });
     });
     
-    const fetchProducts = async () => {
+    const fetchDropdownData = async (docId: string, setData: (data: string[]) => void) => {
         try {
-            const docRef = doc(db, "dropdown", "nametextile");
+            const docRef = doc(db, "dropdown", docId);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists() && Array.isArray(docSnap.data().fields)) {
-                setAllProducts(docSnap.data().fields);
+                setData(docSnap.data().fields);
             }
         } catch (error) {
-            console.error("Error fetching products for suggestions:", error);
+            console.error(`Error fetching ${docId}:`, error);
         }
     };
     
-    fetchProducts();
+    fetchDropdownData('nametextile', setAllProducts);
+    fetchDropdownData('colors', setAllColors);
 
     return () => unsubscribeInvoices();
   }, [user, toast]);
@@ -106,10 +106,9 @@ export default function InvoiceWorkspace() {
         setSelectedInvoice(invoice);
         setLiveInvoice(invoice);
     } else {
-        // Create new invoice object
         if (user) {
             setLiveInvoice({
-                id: '', // Empty ID signifies a new, unsaved invoice
+                id: '', 
                 invoiceNumber: 0,
                 date: new Date().toISOString().split('T')[0],
                 customerName: '',
@@ -149,6 +148,21 @@ export default function InvoiceWorkspace() {
       return allProducts.filter(p => p.toLowerCase().includes(partialName.toLowerCase()));
     }
   };
+
+  const getColorSuggestions = async (partialName: string) => {
+    if (!partialName) return [];
+    try {
+      const result = await suggestColorName({
+        partialColorName: partialName,
+        availableColors: allColors,
+      });
+      return result.suggestions;
+    } catch (error) {
+      console.error("AI color suggestion error:", error);
+      return allColors.filter(c => c.toLowerCase().includes(partialName.toLowerCase()));
+    }
+  };
+
 
    const handlePrint = () => {
     window.print();
@@ -204,6 +218,7 @@ export default function InvoiceWorkspace() {
                 onInvoiceChange={handleLiveInvoiceChange}
                 onSelectInvoice={handleSelectInvoice}
                 getProductSuggestions={getProductSuggestions}
+                getColorSuggestions={getColorSuggestions}
                 userId={user.uid}
             />
         </main>

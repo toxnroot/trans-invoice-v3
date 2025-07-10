@@ -64,7 +64,7 @@ export default function Header({ userProfile, onToggleList, onTogglePreview }: H
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
                 <Avatar>
-                    <AvatarImage src={`user.png`} alt={userProfile.name} data-ai-hint="user avatar" />
+                    <AvatarImage src={`https://placehold.co/32x32.png`} alt={userProfile.name} data-ai-hint="user avatar" />
                     <AvatarFallback>{getAvatarFallback(userProfile.name)}</AvatarFallback>
                 </Avatar>
                 </Button>

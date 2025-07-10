@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -33,16 +32,18 @@ interface InvoiceEditorPanelProps {
   onInvoiceChange: (updatedInvoice: Invoice) => void;
   onSelectInvoice: (invoice: Invoice | null) => void;
   getProductSuggestions: (query: string) => Promise<string[]>;
+  getColorSuggestions: (query: string) => Promise<string[]>;
   userId: string;
 }
 
-const emptyProduct: Omit<Product, 'id' | 'total'> = { name: '', price: 0, quantity: 1, meter: 0 };
+const emptyProduct: Omit<Product, 'id' | 'total'> = { name: '', color: '', price: 0, quantity: 1, meter: 0 };
 
-export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChange, onSelectInvoice, getProductSuggestions, userId }: InvoiceEditorPanelProps) {
+export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChange, onSelectInvoice, getProductSuggestions, getColorSuggestions, userId }: InvoiceEditorPanelProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [product, setProduct] = useState(emptyProduct);
   const [editingProductIndex, setEditingProductIndex] = useState<number | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [productSuggestions, setProductSuggestions] = useState<string[]>([]);
+  const [colorSuggestions, setColorSuggestions] = useState<string[]>([]);
   const { toast } = useToast();
   
   const isNewInvoice = !invoice.id;
@@ -134,8 +135,8 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
 };
   
   const handleAddOrUpdateProduct = () => {
-    if (!product.name || product.price <= 0 || product.quantity < 0 || product.meter < 0) {
-      toast({ variant: 'destructive', title: 'بيانات المنتج غير صالحة' });
+    if (!product.name || !product.color || product.price <= 0 || product.quantity < 0 || product.meter < 0) {
+      toast({ variant: 'destructive', title: 'بيانات المنتج غير صالحة', description: 'الرجاء التأكد من ملء الصنف واللون والسعر.' });
       return;
     }
     
@@ -169,11 +170,23 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
     setProduct({ ...product, name: value });
     if (value.length > 1) {
       const result = await getProductSuggestions(value);
-      setSuggestions(result);
+      setProductSuggestions(result);
     } else {
-      setSuggestions([]);
+      setProductSuggestions([]);
     }
   };
+
+  const handleColorNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setProduct({ ...product, color: value });
+    if (value.length > 1) {
+      const result = await getColorSuggestions(value);
+      setColorSuggestions(result);
+    } else {
+      setColorSuggestions([]);
+    }
+  };
+
 
   return (
     <div className="flex flex-col h-full">
@@ -280,18 +293,30 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
                     <CardTitle>المنتجات</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
                        <Datalist
                             label="الصنف"
                             value={product.name}
                             onInput={handleProductNameChange}
                             onSelect={(value) => {
                                 setProduct({ ...product, name: value });
-                                setSuggestions([]);
+                                setProductSuggestions([]);
                             }}
                             disabled={isLocked}
                         >
-                            {suggestions.map((s,i) => <DatalistOption key={i} value={s} />)}
+                            {productSuggestions.map((s,i) => <DatalistOption key={i} value={s} />)}
+                        </Datalist>
+                        <Datalist
+                            label="اللون"
+                            value={product.color}
+                            onInput={handleColorNameChange}
+                            onSelect={(value) => {
+                                setProduct({ ...product, color: value });
+                                setColorSuggestions([]);
+                            }}
+                            disabled={isLocked}
+                        >
+                            {colorSuggestions.map((s,i) => <DatalistOption key={i} value={s} />)}
                         </Datalist>
                         <div className="space-y-1">
                             <Label htmlFor="productPrice">السعر</Label>
@@ -361,12 +386,10 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
                       <Unlock className="ml-2 h-4 w-4" />
                       {isLocked ? 'فتح الفاتورة' : 'قفل الفاتورة'}
                   </Button>
-                  {userProfile.role === 'admin' && (
-                      <Button onClick={handleToggleTransfer} variant="outline" disabled={isSaving || isLocked}>
-                          <Share2 className="ml-2 h-4 w-4" />
-                          {invoice.isTransfer ? 'إلغاء ترحيل' : 'ترحيل'}
-                      </Button>
-                  )}
+                  <Button onClick={handleToggleTransfer} variant="outline" disabled={isSaving || isLocked}>
+                      <Share2 className="ml-2 h-4 w-4" />
+                      {invoice.isTransfer ? 'إلغاء ترحيل' : 'ترحيل'}
+                  </Button>
               </div>
             )}
         </CardContent>

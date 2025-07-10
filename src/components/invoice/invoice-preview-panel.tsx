@@ -52,6 +52,7 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
                         <tr>
                             <th>م</th>
                             <th>الصنف</th>
+                            <th>اللون</th>
                             <th>السعر</th>
                             <th>العدد</th>
                             <th>متر / كغ</th>
@@ -63,6 +64,7 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
                            <tr key={p.id}>
                                 <td className='tr'>{i + 1}</td>
                                 <td className='tr'>{p.name}</td>
+                                <td className='tr'>{p.color}</td>
                                 <td className='tr'>{formatNumber(p.price || 0)}</td>
                                 <td className='tr'>{p.quantity || 0}</td>
                                 <td className='tr'>{formatNumber(p.meter || 0)}</td>
@@ -72,17 +74,17 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colSpan={3}>الإجمالي الفرعي</td>
+                            <td colSpan={4}>الإجمالي الفرعي</td>
                             <td>{totals.quantity}</td>
                             <td>{formatNumber(totals.meter)}</td>
                             <td>{formatNumber(totals.total)}</td>
                         </tr>
                         <tr>
-                            <td colSpan={5}>الخصم</td>
+                            <td colSpan={6}>الخصم</td>
                             <td>{formatNumber(discount)}</td>
                         </tr>
                         <tr style={{fontSize: '1.4rem'}}>
-                            <td colSpan={5} className="font-semibold">الإجمالي النهائي</td>
+                            <td colSpan={6} className="font-semibold">الإجمالي النهائي</td>
                             <td className="font-semibold">{formatNumber(finalTotal)}</td>
                         </tr>
                     </tfoot>

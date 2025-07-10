@@ -10,7 +10,7 @@
     --card-foreground: 222 84% 5%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 84% 5%;
-    --primary: 231 29% 63%; /* #A88C5C */
+    --primary: 231 29% 63%; /* #7986CB */
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 94%;
     --secondary-foreground: 222 84% 5%;
@@ -189,39 +189,32 @@
     size: A4;
     margin: 0;
   }
-  body {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+  body, html {
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
   }
-
-  /* Hide everything on the page */
+  
   body * {
     visibility: hidden;
   }
   
-  /* Make the paper and its contents visible */
   #paper, #paper * {
     visibility: visible;
   }
 
-  /*
-   * Move the paper to the top-left of the page,
-   * taking it out of the normal flow of the hidden elements.
-   * This is the key to preventing the hidden elements'
-   * layout from affecting the print output.
-   */
   #paper {
-    position: fixed; /* 'fixed' is often more robust for print than 'absolute' */
+    position: fixed; 
     left: 0;
     top: 0;
     margin: 0;
-    padding: 10mm; /* Adjust padding for print margins */
+    padding: 10mm;
     width: 100%;
     height: 100%;
-    min-height: 0; /* Override screen styles */
-    box-shadow: none; /* Remove screen shadow */
+    min-height: 0;
+    box-shadow: none; 
     border: none;
-    box-sizing: border-box; /* Ensure padding is included in width/height */
+    box-sizing: border-box; 
   }
 
   #paper #state-invoice {

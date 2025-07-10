@@ -2,11 +2,12 @@
 
 import { db } from "@/lib/firebase";
 import { Invoice, Product, UserProfile } from "@/lib/types";
-import { collection, addDoc, updateDoc, doc, runTransaction, getDoc, deleteDoc, DocumentReference, writeBatch, getDocs, setDoc } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, runTransaction, getDoc, deleteDoc, DocumentReference, writeBatch, getDocs, setDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { revalidatePath } from "next/cache";
 
 // Helper to revalidate cache
 const revalidate = () => revalidatePath('/');
+const revalidateSuggestions = () => revalidatePath('/admin/suggestions');
 
 export async function createOrUpdateInvoice(invoiceId: string | null, data: Partial<Invoice>): Promise<Invoice> {
     try {
@@ -194,4 +195,40 @@ export async function updateUserRole(targetUserId: string, newRole: 'admin' | 'd
     const userRef = doc(db, 'users', targetUserId);
     await updateDoc(userRef, { role: newRole });
     revalidatePath('/admin/users');
+}
+
+export async function getSuggestions(collectionId: 'nametextile' | 'colors'): Promise<string[]> {
+    const docRef = doc(db, "dropdown", collectionId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        // Ensure fields is an array and sort it
+        return Array.isArray(data.fields) ? data.fields.sort() : [];
+    }
+    return [];
+}
+
+export async function addSuggestion(collectionId: 'nametextile' | 'colors', newValue: string): Promise<void> {
+    if (!newValue.trim()) {
+        throw new Error("Suggestion value cannot be empty.");
+    }
+    const docRef = doc(db, "dropdown", collectionId);
+    
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+        await setDoc(docRef, { fields: [newValue.trim()] });
+    } else {
+        await updateDoc(docRef, {
+            fields: arrayUnion(newValue.trim())
+        });
+    }
+    revalidateSuggestions();
+}
+
+export async function deleteSuggestion(collectionId: 'nametextile' | 'colors', valueToDelete: string): Promise<void> {
+    const docRef = doc(db, "dropdown", collectionId);
+    await updateDoc(docRef, {
+        fields: arrayRemove(valueToDelete)
+    });
+    revalidateSuggestions();
 }

@@ -11,7 +11,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import Header from '@/components/invoice/header';
-import { ArrowRight, Download, FileUp, Upload, Trash2, Users } from 'lucide-react';
+import { ArrowRight, Download, FileUp, Upload, Trash2, Users, ListPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { backupInvoices, restoreInvoices, deleteAllInvoices } from '@/app/actions';
 import {
@@ -197,6 +197,25 @@ export default function ProfilePage() {
                 <p className="capitalize">{userProfile.role === 'admin' ? 'مدير' : 'موظف'}</p>
                 </div>
             </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>أدوات</CardTitle>
+                    <CardDescription>إدارة الاقتراحات لتحسين عملية إدخال الفواتير.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                            <h3 className="font-semibold">إدارة الاقتراحات</h3>
+                            <p className="text-sm text-muted-foreground">إضافة وحذف اقتراحات الأصناف والألوان.</p>
+                        </div>
+                        <Button onClick={() => router.push('/admin/suggestions')}>
+                            <ListPlus className="ml-2 h-4 w-4" />
+                            إدارة الاقتراحات
+                        </Button>
+                    </div>
+                </CardContent>
             </Card>
 
             {userProfile.role === 'admin' && (

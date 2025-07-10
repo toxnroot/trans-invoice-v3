@@ -1,10 +1,13 @@
 import type {NextConfig} from 'next';
 import withPWA from '@ducanh2912/next-pwa';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 const pwaConfig = withPWA({
   dest: 'public',
   register: true,
   skipWaiting: true,
+  disable: isDev,
 });
 
 const nextConfig: NextConfig = {

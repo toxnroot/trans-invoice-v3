@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Product, UserProfile } from '@/lib/types';
@@ -56,6 +55,7 @@ export default function ProductsTable({ products, discount, onEdit, onDelete, is
           <TableRow>
             <TableHead className="w-[50px]">م</TableHead>
             <TableHead>الصنف</TableHead>
+            <TableHead>اللون</TableHead>
             <TableHead className="text-center">السعر</TableHead>
             <TableHead className="text-center">العدد</TableHead>
             <TableHead className="text-center">متر/كغ</TableHead>
@@ -68,6 +68,7 @@ export default function ProductsTable({ products, discount, onEdit, onDelete, is
             <TableRow key={product.id}>
               <TableCell>{index + 1}</TableCell>
               <TableCell className="font-medium">{product.name}</TableCell>
+              <TableCell>{product.color}</TableCell>
               <TableCell className="text-center">{formatNumber(product.price || 0)}</TableCell>
               <TableCell className="text-center">{product.quantity || 0}</TableCell>
               <TableCell className="text-center">{formatNumber(product.meter || 0)}</TableCell>
@@ -100,15 +101,15 @@ export default function ProductsTable({ products, discount, onEdit, onDelete, is
             </TableRow>
           ))}
             <TableRow className="bg-muted/50 font-bold">
-                <TableCell colSpan={5}>الإجمالي الفرعي</TableCell>
+                <TableCell colSpan={6}>الإجمالي الفرعي</TableCell>
                 <TableCell className="text-center" colSpan={2}>{formatNumber(totals.total)} ج.م</TableCell>
             </TableRow>
              <TableRow className="bg-muted/50 font-bold">
-                <TableCell colSpan={5}>الخصم</TableCell>
+                <TableCell colSpan={6}>الخصم</TableCell>
                 <TableCell className="text-center" colSpan={2}>{formatNumber(discount || 0)} ج.م</TableCell>
             </TableRow>
             <TableRow className="bg-muted/50 font-bold text-lg text-primary">
-                <TableCell colSpan={5}>الإجمالي النهائي</TableCell>
+                <TableCell colSpan={6}>الإجمالي النهائي</TableCell>
                 <TableCell className="text-center" colSpan={2}>{formatNumber(finalTotal)} ج.م</TableCell>
             </TableRow>
         </TableBody>
