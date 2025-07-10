@@ -158,7 +158,6 @@ export default function InvoiceWorkspace() {
       });
       return result.suggestions;
     } catch (error) {
-      console.error("AI color suggestion error:", error);
       return allColors.filter(c => c.toLowerCase().includes(partialName.toLowerCase()));
     }
   };
@@ -174,7 +173,8 @@ export default function InvoiceWorkspace() {
       (window as any).html2canvas(paperElement, { 
         scale: 2,
         backgroundColor: '#ffffff',
-        useCORS: true
+        useCORS: true,
+        scrollY: 0
        }).then((canvas: HTMLCanvasElement) => {
         const link = document.createElement('a');
         link.download = `Invoice_${liveInvoiceRef.current?.invoiceNumber || 'preview'}.png`;

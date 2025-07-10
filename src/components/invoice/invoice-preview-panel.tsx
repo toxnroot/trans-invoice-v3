@@ -27,8 +27,8 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
         {invoice ? (
             <div id="paper">
                 <div className="header">
-                    <div>
-                        <span id="storeName">SHAMS TEX</span>
+                    <div className='text-[#A88C5C]'>
+                        <span id="storeName" className='text-black'>SHAMS TEX</span>
                         <p>لصناعة وتجارة الأقمشة</p>
                     </div>
                     <div>
@@ -36,7 +36,7 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
                             backgroundColor: invoice.state === 'أذن مرتجع' ? 'rgb(209, 32, 32)' : '#28a745',
                             color: '#fff'
                         }}>{invoice.state}</h3>
-                        <p className="invoice-number w-full text-center text-lg"> No : <span id="invoiceNumber">{invoice.invoiceNumber || '-'}</span></p>
+                        <p className="invoice-number w-full text-center text-lg text-red-600 p-2"> No : <span id="invoiceNumber">{invoice.invoiceNumber || '-'}</span></p>
                     </div>
                     <div>
                         <Image src="/logo.png" alt="SHAMS TEX Logo" className="logo" width={130} height={130} />
@@ -44,7 +44,7 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
                 </div>
                 <div className="info">
                     <p className="customer text-right">اسم العميل: <span id="customerNameDisplay">{invoice.customerName}</span></p>
-                    <p className="text-center">طريقة الدفع: <span>{invoice.paymentType}</span></p>
+                    <p className="text-center"><span>{invoice.paymentType}</span></p>
                     <p className="date text-left">التاريخ: <span id="invoiceDate">{new Date(invoice.date).toLocaleDateString('en-CA')}</span></p>
                 </div>
                 <table>
@@ -73,18 +73,19 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
                         ))}
                     </tbody>
                     <tfoot>
-                        <tr>
-                            <td colSpan={4}>الإجمالي الفرعي</td>
+                        <tr className='text-right w-full'>
+                            <td colSpan={4}><span className='text-center flex justify-start px-2'>الإجمالي الفرعي</span></td>
+
                             <td>{totals.quantity}</td>
                             <td>{formatNumber(totals.meter)}</td>
                             <td>{formatNumber(totals.total)}</td>
                         </tr>
                         <tr>
-                            <td colSpan={6}>الخصم</td>
+                            <td colSpan={6}><span className='text-center flex justify-start px-2'>الخصم</span></td>
                             <td>{formatNumber(discount)}</td>
                         </tr>
-                        <tr style={{fontSize: '1.4rem'}}>
-                            <td colSpan={6} className="font-semibold">الإجمالي النهائي</td>
+                        <tr style={{fontSize: '1.2'}}>
+                            <td colSpan={6}><span className='text-center flex justify-start px-2'>الإجمالي النهائي</span></td>
                             <td className="font-semibold">{formatNumber(finalTotal)}</td>
                         </tr>
                     </tfoot>
@@ -92,7 +93,7 @@ export default function InvoicePreviewPanel({ invoice }: InvoicePreviewPanelProp
                 <div className="footer mt-8 flex flex-col items-end">
                     <p className="note-r">ملاحظة: لسنا مسؤولين عن القماش بعد القص</p>
                     <p className="note-r">اسم المستلم وتوقيعه: <span>__________________</span></p>
-                    {invoice.note && <p id="notesContainer" className="mt-4">ملاحظة إضافية: <span id="productsNotes">{invoice.note}</span></p>}
+                    {invoice.note && <p id="notesContainer" className="mt-4">ملاحظة : <span id="productsNotes">{invoice.note}</span></p>}
                 </div>
             </div>
         ) : (
