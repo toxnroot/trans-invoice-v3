@@ -223,6 +223,18 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
                         `تعديل الفاتورة #${invoice.invoiceNumber}`
                     )
                 }
+                {/* حالة الفاتورة */}
+                <span
+                  className={cn(
+                    'px-2 py-1 rounded text-xs font-bold',
+                    invoice.state === 'أذن مرتجع'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-green-600 text-white'
+                  )}
+                  style={{ minWidth: 80, textAlign: 'center' }}
+                >
+                  {invoice.state}
+                </span>
                 {!isNewInvoice && (
                     <span className={cn(
                         "status-icon text-sm",
