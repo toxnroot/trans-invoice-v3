@@ -384,9 +384,10 @@ export default function InvoiceEditorPanel({ invoice, userProfile, onInvoiceChan
             </Card>
             
             <div className="grid md:grid-cols-2 gap-4 items-start pt-4">
-                 <div className="space-y-2">
+                 <div className="space-y-2  ">
                     <Label htmlFor="discount">الخصم</Label>
-                    <Input id="discount" type="number" value={invoice.discount || 0} onChange={e => handleFieldChange('discount', +e.target.value)} disabled={isLocked} />
+                    <Input className='border-2 border-red-500' id="discount" type="number" value={invoice.discount || 0} onChange={e => handleFieldChange('discount', +e.target.value)} disabled={isLocked} />
+                    <span>تقدر تستخدمه اذا كان في خصم</span>
                  </div>
                  <div className="space-y-2">
                     <Label htmlFor="note">ملاحظات</Label>
